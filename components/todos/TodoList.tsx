@@ -9,8 +9,6 @@ export default async function TodoList() {
 
   const { data: todos } = await supabase.from('todos').select('*');
 
-  console.log(todos);
-
   return (
     <ul>
       {todos?.map((todo) => (
@@ -18,7 +16,7 @@ export default async function TodoList() {
           <h2 className="font-bold text-xl">{todo.title}</h2>
           <p>{todo.content}</p>
           <div className="flex justify-self-end self-end gap-2">
-            <TodoEditButton />
+            <TodoEditButton id={todo.id} />
             <TodoRemoveButton id={todo.id} />
           </div>
         </li>
