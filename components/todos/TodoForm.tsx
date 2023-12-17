@@ -56,7 +56,7 @@ function SubmitButton({ children }: React.PropsWithChildren) {
   return (
     <button
       type="submit"
-      className="self-end bg-green-500 cursor-pointer hover:bg-green-400 p-2 rounded-lg mt-2 disabled:cursor-not-allowed disabled:opacity-50"
+      className="self-end bg-green-500 cursor-pointer hover:bg-green-700 p-2 rounded-lg mt-2 disabled:cursor-not-allowed disabled:opacity-50"
       disabled={pending}
       aria-disabled={pending}
     >

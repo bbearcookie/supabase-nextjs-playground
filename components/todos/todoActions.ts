@@ -13,9 +13,6 @@ export async function createTodo(
 ) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
-
   const validatedFields = createTodoSchema.safeParse({
     title: formData.get('title'),
     content: formData.get('content'),
@@ -27,6 +24,9 @@ export async function createTodo(
       message: '',
     };
   }
+
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
 
   try {
     const { title, content } = validatedFields.data;
