@@ -2,10 +2,15 @@
 
 import React, { useId } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
-import { createTodo, initialState } from './todoActions';
 import clsx from 'clsx';
+import { createTodo } from './todoActions';
 
 export default function TodoForm() {
+  const initialState = {
+    message: '',
+    errors: {},
+  };
+
   const [state, dispatch] = useFormState(createTodo, initialState);
   const titleId = useId();
   const contentId = useId();
@@ -15,17 +20,30 @@ export default function TodoForm() {
       <div className="flex flex-col gap-2">
         <label className="flex flex-col" htmlFor={titleId}>
           <span>제목</span>
-          <input id={titleId} name="title" type="text" autoComplete="off" />
-          <ErrorMessage id={titleId + '-error'} error={state.errors?.title} />
+          <input
+            id={titleId}
+            aria-describedby={titleId + '-error'}
+            name="title"
+            type="text"
+            autoComplete="off"
+          />
+          <ErrorMessage id={titleId + '-error'} error={state?.errors?.title} />
         </label>
         <label className="flex flex-col" htmlFor={contentId}>
           <span>내용</span>
-          <input id={contentId} name="content" type="text" autoComplete="off" />
+          <input
+            id={contentId}
+            aria-describedby={contentId + '-error'}
+            name="content"
+            type="text"
+            autoComplete="off"
+          />
           <ErrorMessage
             id={contentId + '-error'}
-            error={state.errors?.content}
+            error={state?.errors?.content}
           />
         </label>
+        <ErrorMessage error={state?.message} />
         <SubmitButton>추가</SubmitButton>
       </div>
     </form>
@@ -48,20 +66,26 @@ function SubmitButton({ children }: React.PropsWithChildren) {
 }
 
 interface ErrorMessageProps extends React.HTMLAttributes<HTMLDivElement> {
-  error?: string[];
+  error?: string | string[];
 }
 
 function ErrorMessage({ className, id, error, ...props }: ErrorMessageProps) {
   return (
     <div id={id} aria-live="polite" aria-atomic="true" {...props}>
-      {error?.map((message) => (
-        <p
-          className={clsx('mt-2 text-sm text-red-500', className)}
-          key={message}
-        >
-          {message}
+      {typeof error === 'string' ? (
+        <p className={clsx('mt-2 text-sm text-red-500', className)} key={error}>
+          {error}
         </p>
-      ))}
+      ) : (
+        error?.map((message) => (
+          <p
+            className={clsx('mt-2 text-sm text-red-500', className)}
+            key={message}
+          >
+            {message}
+          </p>
+        ))
+      )}
     </div>
   );
 }

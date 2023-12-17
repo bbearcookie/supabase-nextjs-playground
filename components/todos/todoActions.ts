@@ -1,6 +1,9 @@
+'use server';
+
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { createClient } from '@/utils/supabase/server';
 
 const todoSchema = z.object({
   id: z.string(),
@@ -18,15 +21,10 @@ const todoSchema = z.object({
 const createTodoSchema = todoSchema.omit({ id: true, isDone: true });
 
 export type State = {
-  message?: string | null;
+  message?: string;
   errors?: {
     [key in keyof z.infer<typeof createTodoSchema>]?: string[];
   };
-};
-
-export const initialState: State = {
-  errors: {},
-  message: null,
 };
 
 export async function createTodo(prevState: State, formData: FormData) {
@@ -42,15 +40,23 @@ export async function createTodo(prevState: State, formData: FormData) {
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Please fill in all fields',
+      message: '',
     };
   }
 
-  const { title, content } = validatedFields.data;
+  try {
+    const { title, content } = validatedFields.data;
 
-  console.log(title);
-  console.log(content);
+    console.log(title);
+    console.log(content);
 
-  // revalidatePath('/todos');
+    throw new Error('test');
+  } catch (error) {
+    return {
+      message: 'hmm... something went wrong',
+    };
+  }
+
+  revalidatePath('/todos');
   redirect('/todos');
 }
