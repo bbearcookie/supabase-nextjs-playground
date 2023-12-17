@@ -2,40 +2,24 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { z } from 'zod';
+import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
+import { insertTodo } from './todoRepository';
+import { State, createTodoSchema } from './todoSchema';
 
-const todoSchema = z.object({
-  id: z.string(),
-  title: z
-    .string()
-    .min(1, { message: '제목을 입력해주세요' })
-    .max(10, { message: '제목은 10자 이내로 입력해주세요' }),
-  content: z
-    .string()
-    .min(1, { message: '내용을 입력해주세요' })
-    .max(100, { message: '내용은 100자 이내로 입력해주세요' }),
-  isDone: z.boolean(),
-});
-
-const createTodoSchema = todoSchema.omit({ id: true, isDone: true });
-
-export type State = {
-  message?: string;
-  errors?: {
-    [key in keyof z.infer<typeof createTodoSchema>]?: string[];
-  };
-};
-
-export async function createTodo(prevState: State, formData: FormData) {
+export async function createTodo(
+  prevState: State<typeof createTodoSchema>,
+  formData: FormData
+) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
 
   const validatedFields = createTodoSchema.safeParse({
     title: formData.get('title'),
     content: formData.get('content'),
   });
-
-  console.log(validatedFields);
 
   if (!validatedFields.success) {
     return {
@@ -47,10 +31,10 @@ export async function createTodo(prevState: State, formData: FormData) {
   try {
     const { title, content } = validatedFields.data;
 
-    console.log(title);
-    console.log(content);
-
-    throw new Error('test');
+    await insertTodo(supabase, {
+      title,
+      content,
+    });
   } catch (error) {
     return {
       message: 'hmm... something went wrong',
