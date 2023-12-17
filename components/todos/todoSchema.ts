@@ -14,6 +14,7 @@ const todoSchema = z.object({
 });
 
 export const createTodoSchema = todoSchema.omit({ id: true, isDone: true });
+export const modifyTodoSchema = todoSchema.omit({ isDone: true });
 
 export type State<T extends ZodType> = {
   message?: string;

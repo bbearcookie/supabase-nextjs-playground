@@ -2,14 +2,22 @@ import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
 import TodoEditButton from './TodoEditButton';
 import TodoRemoveButton from './TodoRemoveButton';
-import { createTodo } from '@/components/todos/todoActions';
-import TodoForm from './TodoForm';
+
+import TodoEditForm from './TodoEditForm';
 
 interface TodoListProps {
-  editingId: string;
+  searchParams: {
+    editingId?: string;
+    title?: string;
+    content?: string;
+  };
 }
 
-export default async function TodoList({ editingId }: TodoListProps) {
+export default async function TodoList({ searchParams }: TodoListProps) {
+  const editingId = searchParams?.editingId ?? '0';
+  const title = searchParams?.title ?? '';
+  const content = searchParams?.content ?? '';
+
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
 
@@ -20,13 +28,13 @@ export default async function TodoList({ editingId }: TodoListProps) {
       {todos?.map((todo) => (
         <li className="flex flex-col" key={todo.id}>
           {editingId === `${todo.id}` ? (
-            <TodoForm action={createTodo} />
+            <TodoEditForm defaultValues={{ id: editingId, title, content }} />
           ) : (
             <>
               <h2 className="font-bold text-xl">{todo.title}</h2>
               <p>{todo.content}</p>
               <div className="flex justify-self-end self-end gap-2">
-                <TodoEditButton id={todo.id} />
+                <TodoEditButton id={todo.id} defaultValues={{ ...todo }} />
                 <TodoRemoveButton id={todo.id} />
               </div>
             </>
