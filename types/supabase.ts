@@ -24,6 +24,30 @@ export interface Database {
         }
         Relationships: []
       }
+      todos: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: number
+          isDone: boolean | null
+          title: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: number
+          isDone?: boolean | null
+          title?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: number
+          isDone?: boolean | null
+          title?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
